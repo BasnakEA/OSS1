@@ -37,7 +37,7 @@ title: Отчет по ЛР №1 "Основы C++ и Windows API"
                 double ticks_per_sec = frequency.QuadPart;
                 double usec_per_sec = 1e6;
                 double usec = usec_per_sec * ticks / ticks_per_sec;
-                printf("result = %g, duration = %f.3 usec\n", result, usec);
+                printf("result = %g, duration = %.1f usec\n", result, usec);
             }
             else
             {
@@ -60,7 +60,7 @@ title: Отчет по ЛР №1 "Основы C++ и Windows API"
 
 Точные замеры времени
 
-result = 1.45471e+006, duration = 8.500000.3 usec
+result = 1.31951e+006, duration = 6.5 usec
 
 ---
 
@@ -134,12 +134,16 @@ Username: exxtie
 
 Computer name: DESKTOP-0OLC8OP
 
+![Имя устройства](CompName.png)
+    
+![Имя пользователя](UserName.png)
+
 ---
 
-## Получение информации о дисках. Получение пути к тому в файловой системе.
+## Получение информации о дисках. Получение пути к тому в файловой системе. Получение информации о свободном месте на томе.
 
 ```cpp
-    printf("\nПолучение информации о дисках + Получение пути к тому в файловой системе\n\n");
+    printf("\nПолучение информации о дисках + Получение пути к тому в файловой системе + Получение информации о свободном месте на томе\n\n");
 
     char buffer[MAX_PATH];
 
@@ -159,6 +163,23 @@ Computer name: DESKTOP-0OLC8OP
             i++;
         }
 
+        // Получение информации о свободном месте на томе (начало)
+        printf("\nИнформация о свободном месте на томе\n\n");
+
+        ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
+        if (GetDiskFreeSpaceExA(buffer, &FreeBytes, &TotalBytes, &TotalFreeBytes))
+        {
+            printf("Total number of MB on a disk: %u MB\n", TotalBytes.QuadPart / (1024*1024));
+            printf("Total number of free MB: %u MB\n", TotalFreeBytes.QuadPart / (1024*1024));
+            printf("Total number of free MB available to the caller: %u MB\n", FreeBytes.QuadPart / (1024*1024));
+        }
+        else
+        {
+            printf("GetDiskFreeSpaceExA Error: %u\n", GetLastError());
+        }
+        // Получение информации о свободном месте на томе (конец)
+
+        printf("\n");
     } while (FindNextVolumeA(search, buffer, sizeof(buffer)));
 
     if (GetLastError() != ERROR_NO_MORE_FILES) {
@@ -172,11 +193,21 @@ Computer name: DESKTOP-0OLC8OP
 
 ### Результат работы
 
-Получение информации о дисках + Получение пути к тому в файловой системе
+Получение информации о дисках + Получение пути к тому в файловой системе + Получение информации о свободном месте на томе
 
 Volume: \\?\Volume{61d97585-3738-4b8b-bb99-511c96f0089b}\
 
 Mount point 1: D:\
+
+Информация о свободном месте на томе
+
+Total number of MB on a disk: 510 MB
+
+Total number of free MB: 493 MB
+
+Total number of free MB available to the caller: 493 MB
+
+<br/>
 
 Volume: \\?\Volume{061c9bff-c99b-465a-a4cc-fe2bbf72dd7d}\
 
@@ -184,41 +215,42 @@ Mount point 1: C:\
 
 Mount point 2: C:\lab01-test\
 
-Volume: \\?\Volume{b2f1aa00-de52-4e73-9541-86d82be60802}\
-
-Volume: \\?\Volume{5efd94c1-8a22-4e89-8289-2b230dacaa5c}\
-
----
-
-## Получение информации о свободном месте на томе
-
-```cpp
-    printf("\nПолучение информации о свободном месте на томе\n\n");
-
-    ULARGE_INTEGER FreeBytes, TotalBytes, TotalFreeBytes;
-    if (GetDiskFreeSpaceExA("C:\\", &FreeBytes, &TotalBytes, &TotalFreeBytes))
-    {
-        printf("Total number of free MB available to the caller: %u MB\n", FreeBytes.QuadPart / (1024*1024));
-        printf("Total number of MB on a disk: %u MB\n", TotalBytes.QuadPart / (1024*1024));
-        printf("Total number of free MB: %u MB\n", TotalFreeBytes.QuadPart / (1024*1024));
-    }
-    else
-    {
-        printf("GetDiskFreeSpaceExA Error: %u\n", GetLastError());
-    }
-
-```
-
----
-
-### Результат работы
-
-Получение информации о свободном месте на томе
-
-Total number of free MB available to the caller: 41615 MB
+Информация о свободном месте на томе
 
 Total number of MB on a disk: 379324 MB
 
-Total number of free MB: 41615 MB
+Total number of free MB: 25778 MB
+
+Total number of free MB available to the caller: 25778 MB
+
+<br/>
+
+Volume: \\?\Volume{b2f1aa00-de52-4e73-9541-86d82be60802}\
+
+Информация о свободном месте на томе
+
+Total number of MB on a disk: 519 MB
+
+Total number of free MB: 84 MB
+
+Total number of free MB available to the caller: 84 MB  
+
+<br/>
+
+Volume: \\?\Volume{5efd94c1-8a22-4e89-8289-2b230dacaa5c}\
+
+Информация о свободном месте на томе
+
+Total number of MB on a disk: 96 MB
+
+Total number of free MB: 70 MB
+
+Total number of free MB available to the caller: 70 MB
+
+![Тома](Disks.png)
 
 ---
+
+В данном пункте для проверки работы вывода точек монтирования для диска C была добавлена дополнительная точка монитрования C:\lab01-test.
+
+![Доп точка монтирования](MountPoint.png)
